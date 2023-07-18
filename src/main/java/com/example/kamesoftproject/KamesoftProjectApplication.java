@@ -16,9 +16,6 @@ public class KamesoftProjectApplication implements CommandLineRunner {
 
     String path = "src/main/resources/Users.txt";
 
-    @Autowired
-    private ConversionService conversionService;
-
     private static Logger log = LoggerFactory
             .getLogger(KamesoftProjectApplication.class);
 

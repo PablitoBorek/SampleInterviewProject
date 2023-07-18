@@ -1,73 +1,93 @@
 package com.example.kamesoftproject.service;
 
+import com.example.kamesoftproject.DAO.UserDao;
 import com.example.kamesoftproject.model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class UserService {
-    @Autowired
-    private ConversionService conversionService;
 
-    private  static final String pathToDatabase = "jdbc:h2:~/test";
+    private final ConversionService conversionService;
+    private final UserDao userDao;
+
+    public UserService(ConversionService conversionService, UserDao userDao) {
+        this.conversionService = conversionService;
+        this.userDao = userDao;
+    }
+
+    private final static Logger log = LoggerFactory
+            .getLogger(UserService.class);
+
 
     public void executeUpdate(String path) {
-        try (Connection connection = DriverManager.getConnection(pathToDatabase)) {
-
-            BufferedReader reader = new BufferedReader(new FileReader(path));
+        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
             String line;
             List<User> users = new ArrayList<>();
             List<String> wrongFormatLines = new ArrayList<>();
             while ((line = reader.readLine()) != null) {
-                try {
-                    User user = conversionService.convert(line, User.class);
-                    users.add(user);
-                } catch (ConversionFailedException e) {
+                User user = convertIntoUser(line);
+                if (user == null) {
                     wrongFormatLines.add(line);
+                } else {
+                    users.add(user);
                 }
             }
-             // Find existing users
-            // save users to database
+            List<User> userExistingInDatabase = findExistingUsers(users);
+            users.removeAll(userExistingInDatabase);
+            saveUsersIntoDatabase(users);
 
-            reader.close();
-            sendMessage(users, wrongFormatLines);
+            sendMessage(users, wrongFormatLines, userExistingInDatabase);
 
-          //  connection.prepareStatement("insert into users VALUES ('John','Smith',25,'john.smith@example.com')");
-
-        } catch (IOException | SQLException e) {
-            System.out.println("Failed to load file from path " + path);
+        } catch (IOException e) {
+            log.error("Failed to load file from path " + path);
         }
-
-
-
     }
 
-    private void sendMessage(List<User> users, List<String> wrongFormatLines) {
-        if (users.isEmpty()  && wrongFormatLines.isEmpty()) {
+    private void sendMessage(List<User> users, List<String> wrongFormatLines, List<User> existingUsers) {
+        if (users.isEmpty() && wrongFormatLines.isEmpty()) {
             System.out.println("File is empty");
         } else if (users.isEmpty()) {
             System.out.println("Failed to save any record to database");
         } else {
             System.out.println("Successfully saved " + users.size() + " records in database ");
-            System.out.println("All failed records to save :");
+            System.out.println("Lines with wrong format :");
             wrongFormatLines.forEach(System.out::println);
+            if (!existingUsers.isEmpty()) {
+                System.out.println("Record already existing in database ");
+                existingUsers.forEach(System.out::println);
+            }
+
         }
     }
 
-    private void saveToDabase() {
-
+    private void saveUsersIntoDatabase(List<User> users) {
+        users.forEach(userDao::insertUser);
     }
 
-    //private List<User> findExistingUsers()
+    private List<User> findExistingUsers(List<User> users) {
+        return users.stream()
+                .filter(userDao::isUserInDatabase)
+                .toList();
+    }
+
+    private User convertIntoUser(String line) {
+        try {
+            return conversionService.convert(line, User.class);
+        } catch (ConversionFailedException e) {
+            return null;
+        }
+    }
 }
