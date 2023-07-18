@@ -13,8 +13,11 @@ public class UserShellCommand {
 
     private static final String defaultPath = "src/main/resources/Users.txt";
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+
+    public UserShellCommand(UserService userService) {
+        this.userService = userService;
+    }
 
     private static Logger log = LoggerFactory
             .getLogger(UserShellCommand.class);
