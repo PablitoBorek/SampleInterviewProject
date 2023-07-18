@@ -1,43 +1,34 @@
-package com.example.kamesoftproject.service;
+package com.example.KamsoftProject.service;
 
-import com.example.kamesoftproject.DAO.UserDao;
-import com.example.kamesoftproject.model.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.KamsoftProject.DAO.UserDataAccessService;
+import com.example.KamsoftProject.model.User;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.convert.ConversionFailedException;
 import org.springframework.core.convert.ConversionService;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class UserService {
 
     private final ConversionService conversionService;
-    private final UserDao userDao;
-
-    public UserService(ConversionService conversionService, UserDao userDao) {
-        this.conversionService = conversionService;
-        this.userDao = userDao;
-    }
-
-    private final static Logger log = LoggerFactory
-            .getLogger(UserService.class);
-
+    private final UserDataAccessService userDataAccessService;
 
     public void executeUpdate(String path) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(path))) {
-            String line;
+        try {
+            List<String> lines = Files.readAllLines(Paths.get(path));
             List<User> users = new ArrayList<>();
             List<String> wrongFormatLines = new ArrayList<>();
-            while ((line = reader.readLine()) != null) {
+
+            for (String line : lines) {
                 User user = convertIntoUser(line);
                 if (user == null) {
                     wrongFormatLines.add(line);
@@ -45,6 +36,7 @@ public class UserService {
                     users.add(user);
                 }
             }
+
             List<User> userExistingInDatabase = findExistingUsers(users);
             users.removeAll(userExistingInDatabase);
             saveUsersIntoDatabase(users);
@@ -57,6 +49,9 @@ public class UserService {
     }
 
     private void sendMessage(List<User> users, List<String> wrongFormatLines, List<User> existingUsers) {
+        if (users.isEmpty() && wrongFormatLines.isEmpty() && !existingUsers.isEmpty()) {
+            System.out.println("All records exist in database");
+        }
         if (users.isEmpty() && wrongFormatLines.isEmpty()) {
             System.out.println("File is empty");
         } else if (users.isEmpty()) {
@@ -74,12 +69,12 @@ public class UserService {
     }
 
     private void saveUsersIntoDatabase(List<User> users) {
-        users.forEach(userDao::insertUser);
+        users.forEach(userDataAccessService::insertUser);
     }
 
     private List<User> findExistingUsers(List<User> users) {
         return users.stream()
-                .filter(userDao::isUserInDatabase)
+                .filter(userDataAccessService::isUserInDatabase)
                 .toList();
     }
 

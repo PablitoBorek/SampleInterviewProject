@@ -1,6 +1,6 @@
-package com.example.kamesoftproject.configuration;
+package com.example.KamsoftProject.configuration;
 
-import com.example.kamesoftproject.util.converter.StringToUserConverter;
+import com.example.KamsoftProject.util.converter.StringToUserConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.ConversionService;

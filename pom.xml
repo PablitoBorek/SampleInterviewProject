@@ -11,8 +11,8 @@
     <groupId>com.example</groupId>
     <artifactId>KamesoftProject</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>KamesoftProject</name>
-    <description>KamesoftProject</description>
+    <name>KamsoftProject</name>
+    <description>KamsoftProject</description>
     <properties>
         <java.version>17</java.version>
     </properties>
@@ -42,22 +42,6 @@
         </dependency>
 
         <dependency>
-            <groupId>io.projectreactor</groupId>
-            <artifactId>reactor-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webflux</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-json</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>compile</scope>
@@ -77,6 +61,10 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>

@@ -1,4 +1,4 @@
-package com.example.kamesoftproject.configuration;
+package com.example.KamsoftProject.configuration;
 
 import com.zaxxer.hikari.HikariDataSource;
 import org.springframework.context.annotation.Bean;

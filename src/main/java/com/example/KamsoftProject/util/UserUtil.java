@@ -1,4 +1,4 @@
-package com.example.kamesoftproject.util;
+package com.example.KamsoftProject.util;
 
 import java.util.regex.Pattern;
 
@@ -13,4 +13,6 @@ public class UserUtil {
     }
 
     public static boolean isValidEmail(String email) {return Pattern.matches(emailPattern, email);}
+
+    public static boolean isValidAge(int age) {return age >= 0 && age <= 150;}
 }

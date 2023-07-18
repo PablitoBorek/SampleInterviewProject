@@ -1,7 +1,7 @@
-package com.example.kamesoftproject.util.converter;
+package com.example.KamsoftProject.util.converter;
 
-import com.example.kamesoftproject.model.User;
-import com.example.kamesoftproject.util.UserUtil;
+import com.example.KamsoftProject.model.User;
+import com.example.KamsoftProject.util.UserUtil;
 import org.springframework.core.convert.converter.Converter;
 
 public class StringToUserConverter implements Converter<String, User>{
@@ -19,7 +19,8 @@ public class StringToUserConverter implements Converter<String, User>{
         int age = Integer.parseInt(parts[2]);
         String emailAddress = parts[3];
 
-        if (UserUtil.isValidName(firstName) && UserUtil.isValidName(lastName) && UserUtil.isValidEmail(emailAddress)) {
+        if (UserUtil.isValidName(firstName) && UserUtil.isValidName(lastName)
+                && UserUtil.isValidEmail(emailAddress) && UserUtil.isValidAge(age)) {
             return new User(firstName, lastName, age, emailAddress);
         } else {
             throw new IllegalArgumentException("Invalid field format");
