@@ -21,5 +21,4 @@ aby przeczytać opis wystaczy wpisać polecenie
 help
 ```
 ## Screenshots
-
-![Screenshot] (https://github.com/PawelOnlyJava/SampleInterviewProject/blob/master/src/main/resources/Scren1.png)
+https://github.com/PawelOnlyJava/SampleInterviewProject/blob/master/src/main/resources/Scren1.png
